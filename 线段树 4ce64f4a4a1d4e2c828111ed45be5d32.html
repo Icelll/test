@@ -1,0 +1,839 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>线段树</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+    margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-interactiveBlue { background-color: rgba(35, 131, 226, .07); }
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-translucentGray { background-color: rgba(255, 255, 255, 0.0375); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="4ce64f4a-4a1d-4e2c-8281-11ed45be5d32" class="page sans"><header><h1 class="page-title">线段树</h1><p class="page-description"></p></header><div class="page-body"><h3 id="b606dee2-bdd0-4cd3-8e91-91ea1a876a13" class="">定义</h3><ul id="d9b71eb9-40de-4238-be2a-0ad15092f172" class="bulleted-list"><li style="list-style-type:disc">线段树是一个完全二叉树</li></ul><ul id="1d3509a4-fb95-4617-a512-205a9b533c04" class="bulleted-list"><li style="list-style-type:disc">它在各个节点保存一条线段（数组中的一段子数组）</li></ul><ul id="86ab0b63-6f5a-4464-8ddd-110a369d0b7e" class="bulleted-list"><li style="list-style-type:disc">每个单元区间对应线段树中的一个叶结点</li></ul><ul id="d41ddcc9-7268-484d-8b9c-bdc9b1acf087" class="bulleted-list"><li style="list-style-type:disc"><strong>性质：父亲的区间是[l,r],(m=(l+r)/2)左儿子的区间是[l,m]，右儿子的区间是[m+1,r]，线段树需要的空间为数组大小的四倍</strong></li></ul><h3 id="d92c12a7-34c1-4725-af2a-e4ce3a86813a" class="">基本操作</h3><p id="f6d40ad3-f7e9-471e-a457-acbba11ad846" class="">这里举的是区间加与区间求和的例子</p><p id="f783acf3-4ca5-4df7-ba30-f26069b309c9" class="">先列出来</p><ol type="1" id="673a1626-b6f3-4097-bf9e-82f8378dec11" class="numbered-list" start="1"><li>建线段树</li></ol><ol type="1" id="74c4b937-bada-49d7-84d0-f377d0406867" class="numbered-list" start="2"><li>区间加</li></ol><ol type="1" id="ab14c0d8-a548-4352-ba78-4e3bb7fed30f" class="numbered-list" start="3"><li>区间查询和</li></ol><h3 id="c1412423-5ac2-4890-a824-d3c80479ca36" class="">建树</h3><ul id="c0bdb5fc-1ae7-4d12-9fe9-5de0a915be3f" class="bulleted-list"><li style="list-style-type:disc">首先，需要一个结构体，来保存一个节点</li></ul><pre id="b1848668-bdab-4fc9-bd7e-b7d8bd59f22b" class="code code-wrap"><code>struct node
+{
+    int left, right;
+    //表示这个节点能够在数组中管辖的线段的范围是从left到right
+
+    int s;
+    //表示这条线段的区间和
+
+    node *ch[2];
+    //节点的两个孩子，ch[0]为左孩子，ch[1]是右孩子
+}pool[MAXN], *root;//pool是内存池，root是根节点
+</code></pre><ul id="7431a844-08c0-4c34-939b-ce07df0a12ed" class="bulleted-list"><li style="list-style-type:disc">这样就能够用node来表示线段树的节点（但这还不够，详看区间加）</li></ul><ul id="b08ce9b8-7bea-4f61-964d-47ad4d49d205" class="bulleted-list"><li style="list-style-type:disc">接下来是建树操作</li></ul><pre id="6d57d9bd-f347-4f07-9576-db62fb091a6d" class="code code-wrap"><code>void Build_Tree(node *r, int left, int right)
+//递归建树，指以r为根节点建线段为left至right的子树
+{
+    r-&gt;left = left;
+    r-&gt;right = right;
+    //将r-&gt;left更新为left，r-&gt;right更新为right
+    if(left == right)
+    //如果递归到了叶子节点
+    {
+        r-&gt;s = a[left];
+        //单个叶子节点的区间和就是数组中的那个值
+        return ;
+    }
+    int mid = (left + right) / 2;//详见性质
+    node *lson = &amp;pool[++cnt];//申请空间
+    node *rson = &amp;pool[++cnt];//申请空间
+    r-&gt;ch[0] = lson;//让r的左子指向lson
+    r-&gt;ch[1] = rson;//让r的右子指向rson
+    Build_Tree(lson, left, mid);     //递归建树，详见性质
+    Build_Tree(rson, mid + 1, right);//递归建树，详见性质
+    r-&gt;s = r-&gt;ch[0]-&gt;s + r-&gt;ch[1]-&gt;s;//维护和
+}
+</code></pre><hr id="50cff4b4-d83a-45cf-b428-b68645fab0bf"/><h3 id="cd2646d4-7263-45b3-b86f-74ba4381f8c5" class="">区间加</h3><p id="3c1491b4-a791-4597-b904-146e5df24c4f" class="">即给定一个区间left，right和一个需要加上的值 完成操作：让left ~ right的所有数加上一个d</p><ul id="bf648661-a8af-4bc6-951c-a3e63234d982" class="bulleted-list"><li style="list-style-type:disc">暴力操作：一个一个点进行单点修改，复杂度<em>O</em>(<em>n</em>log2<em>n</em>)</li></ul><ul id="1c2d29bc-18af-46f2-8974-4e7dc9af4587" class="bulleted-list"><li style="list-style-type:disc">显然复杂度不满足要求</li></ul><ul id="b491ab75-694e-479f-8d4f-ea8c97eec6b2" class="bulleted-list"><li style="list-style-type:disc">所以，我们换一种方式</li></ul><ul id="493dfc03-2c0f-4e7c-85f3-6e33de091e72" class="bulleted-list"><li style="list-style-type:disc"><strong>在每一个节点中加入一个懒标记，表示这个整个区间每一个数需要加上这个懒标记</strong></li></ul><ul id="b8b6b661-e084-4ccd-acfb-407df0d84169" class="bulleted-list"><li style="list-style-type:disc">比如说要给[1,4]加上5，那么就让表示[1,4]的区间的<em>l</em><em>a</em><em>z</em><em>y</em>(懒标记)加上5</li></ul><ul id="32505db4-c087-457a-88af-5f2cebfb8add" class="bulleted-list"><li style="list-style-type:disc">我们需要一个pushdown函数，把一个节点的懒标记转换成区间和并且下发到自己的左右两子</li></ul><p id="4b2bbb2b-467e-49da-8671-918ffba1df06" class=""><strong>pushdown:</strong></p><pre id="80fbc6de-576e-4799-95d9-2813e5d640c7" class="code code-wrap"><code>inline void Push(node *r)
+{
+    if(r-&gt;lazy == 0) return ; //没有需要加的值直接return
+    r-&gt;s += (r-&gt;right - r-&gt;left + 1) * r-&gt;lazy;
+    //区间和加上区间的长度(right - left + 1)乘上每个数需要加上的值lazy
+    if(r-&gt;ch[0]) r-&gt;ch[0]-&gt;lazy += r-&gt;lazy;
+    if(r-&gt;ch[1]) r-&gt;ch[1]-&gt;lazy += r-&gt;lazy;
+    //左右两子的lazy加上自己的lazy
+    r-&gt;lazy = 0;
+}
+</code></pre><p id="0ac2c0df-96e5-42f3-a23f-f9d94499c0e6" class="">修改函数:</p><pre id="2694bec0-a323-45c7-bfbd-aab7687f9c40" class="code code-wrap"><code>void change(node *r, int left, int right, int d)
+{
+    //d是要加上的数
+    if(r-&gt;left == left &amp;&amp; r-&gt;right == right)
+    //找到了要修改的区间
+    {
+        r-&gt;lazy += d;//把每个数要加的值lazy加上d
+        return ;
+    }
+    Push(r);
+    //发放lazy
+    if(r-&gt;ch[0]-&gt;right &gt;= right) change(r-&gt;ch[0], left, right, d);
+    //如果左子的右端点比要查找的右端点大，则在左子中继续修改
+    else if(r-&gt;ch[1]-&gt;left &lt;= left) change(r-&gt;ch[1], left, right, d);
+    //如果右子的左端点比要查找的左端点小，则在右子中继续修改
+    {
+          change(r-&gt;ch[0], left, r-&gt;ch[0]-&gt;right, d);
+          change(r-&gt;ch[1], r-&gt;ch[1]-&gt;left, right, d);
+          //否则把需要查找的区间砍成两半，分别在左右端点分别修改
+    }
+    Push(r-&gt;ch[0]), Push(r-&gt;ch[1]);
+    //重新发放lazy（之前少了这一步带来了不便）
+    r-&gt;s = r-&gt;ch[0]-&gt;s + r-&gt;ch[1]-&gt;s
+    //因为修改了值，所以需要重新维护s
+}
+</code></pre><hr id="62636162-54ed-49c9-95a2-1cb210c1300a"/><h3 id="20fa40d7-7cf1-48a9-b419-577e9f9e408f" class="">区间和</h3><ul id="acec42fb-e145-459d-81a8-25b2fe0b47d3" class="bulleted-list"><li style="list-style-type:disc">给你一个区间[<em>left</em>,<em>right</em>],求<em>i</em>=sum(a[left:right])</li></ul><ul id="38a66a75-4cb1-4a61-8fcf-de87cb45f338" class="bulleted-list"><li style="list-style-type:disc">与区间修改相似，给一个代码</li></ul><pre id="e3f8903e-6989-44c1-9f6f-a25017429be3" class="code code-wrap"><code>int query(node *r, int left, int right)
+{
+    Push(r);//最开始Push，免得返回时再算一遍
+    if(r-&gt;left == left &amp;&amp; r-&gt;right == right) return r-&gt;s;
+    if(r-&gt;ch[0]-&gt;right &gt;= right) return query(r-&gt;ch[0], left, right);
+    else if(r-&gt;ch[1]-&gt;left &lt;= left) return query(r-&gt;ch[1], left, right);
+    else
+        return query(r-&gt;ch[0], left, r-&gt;ch[0]-&gt;right) +
+               query(r-&gt;ch[1], r-&gt;ch[1]-&gt;left, right);
+
+}
+</code></pre><hr id="b978aee3-bdff-40eb-9c18-580584acdda6"/><h2 id="0adb2dc6-0ea0-4214-8e38-03d5c28b1c75" class="">数组版线段树</h2><pre id="43215e8e-6879-4cc3-9fcd-51c19a1797ec" class="code code-wrap"><code>#include &lt;bits/stdc++.h&gt;#define ll long long
+using namespace std;
+ll n, m;
+ll L = 1, a[100100];
+struct st_n//SegmentTree node 线段树节点
+{
+    ll left, right;//每个节点的控制范围
+    ll lazy, s;       //s表示和
+}t[300005];
+void build_tree()//建线段树
+{
+    while(L &lt; n) L *= 2;
+    for(ll i = 1; i &lt;= n; i++)
+        t[i + L - 1].left = t[i + L - 1].right = i,
+        t[i + L - 1].s = a[i];//将最后一层赋值
+    for(ll i = L + n;i &lt; 2 * L;i++)
+        t[i].left = t[i].right = i - L + 1;
+    for(ll i = L - 1; i &gt;= 1; i--)
+        t[i].left = t[2 * i].left,
+        t[i].right = t[2 * i + 1].right,
+        t[i].s += t[2 * i + 1].s + t[2 * i].s;
+        //建树
+}
+
+void push(ll id)//发放lazy值给左右子
+{
+    t[2 * id].lazy += t[id].lazy;//左子
+    t[2 * id + 1].lazy += t[id].lazy;//右子
+    t[id].s += (t[id].right - t[id].left + 1) * t[id].lazy;//更新节点的值
+    t[id].lazy = 0;
+}
+
+//区间修改
+void change(ll id, ll left, ll right, ll d)
+{
+    if(t[id].left == left &amp;&amp; t[id].right == right)//找到了
+    {
+        t[id].lazy += d;
+        return ;
+    }
+    push(id);//发放lazy值
+    if(t[2 * id].right &gt;= right) change(2 * id, left, right, d);//如果左子的右管辖范围比所求大，则只在左子中继续change
+    else if(t[2 * id + 1].left &lt;= left) change(2 * id + 1, left, right, d);//同上
+    else
+    {
+        change(2 * id, left, t[2 * id].right, d);
+        change(2 * id + 1, t[2 * id + 1].left, right, d);
+        //左右子分别查找
+    }
+    t[id].s = t[2 * id].s + t[2 * id + 1].s
+            + (t[2 * id].right - t[2 * id].left + 1) * t[2 * id].lazy
+            + (t[2 * id + 1].right - t[2 * id + 1].left + 1) * t[2 * id + 1].lazy;
+    //上面这步很重要，它的功能也是更新（其实我原本想写个函数）
+}
+ll query(ll id, ll left, ll right)//查询
+{
+    //与change很像，就不多说了。
+    if(t[id].left == left &amp;&amp; t[id].right == right)
+        return t[id].s + (t[id].right - t[id].left + 1) * t[id].lazy;
+    push(id);
+    if(t[2 * id].right &gt;= right) return query(2 * id, left, right);
+    else if(t[2 * id + 1].left &lt;= left) return query(2 * id + 1, left, right);
+    else return query(2 * id, left, t[2 * id].right) + query(2 * id + 1, t[2 * id + 1].left, right);
+}
+int main(int argc, char *argv[])
+{
+    cin &gt;&gt; n &gt;&gt; m;
+    for(ll i = 1; i &lt;= n; i++) cin &gt;&gt; a[i];
+    build_tree();//建树
+    for(ll i = 1;i &lt;= m;i++)
+    {
+        ll p, x, y;
+        ll d;
+        cin &gt;&gt; p &gt;&gt; x &gt;&gt; y;
+        if(p == 1)
+        {
+            cin &gt;&gt; d;
+            change(1, x, y, d);
+        }
+        else
+            cout &lt;&lt; query(1, x, y) &lt;&lt; endl;
+    }
+    return 0;
+}</code></pre><p id="96300e2b-0323-4ce8-b50e-3e657b18f27b" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
